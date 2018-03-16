@@ -41,10 +41,8 @@ app.get("/scrape", function(req, res) {
 });
 
 
-
-
 app.get("/", function(req, res) {
-    res.render("home");
+    res.render("index");
 });
 
 
@@ -59,19 +57,51 @@ app.get("/articles", function(req, res) {
 });
 
 
+app.get("/articles/saved", function(req, res) {
+	db.Article.find({
+		saved: true
+	}).then(function(dbArticle) {
+		console.log(dbArticle);
+	}).catch(function(err) {
+		res.json.(err)''
+	});
+});
+
+
 app.get("/articles/:id", function(req, res) {
-
-
+	db.Article.findOne({
+		_id: req.params.id
+	}).populate("notes")
+	.then(function(dbArticle) {
+		console.log(dbArticle);
+		//res.json(dbArticle);
+	}).catch(function(err) {
+		res.json(err);
+	});
 });
 
-app.post("/articles/:id/post", function(req, res) {
 
-
+app.post("/articles/:id", function(req, res) {
+	db.Note.create(req.body)
+	.then(function(dbNote) {
+		return db.Article.findOneAndUpdate({}, {$push: {
+			notes: dbNote._id
+		}}, {new: true});
+	}).then(function(dbArticle) {
+		res.json(dbArticle);
+	}).catch(function(err) {
+		res.json(err);
+	});
 });
 
+app.get("/articles/populated", function(req, res) {
+	db.Article.find({})
+	.populate("notes")
+	.then(function(dbArticle) {
+		res.json(dbArticle);
+	}).catch(function(err) {
+		res.json(err);
+	})
+})
 
-app.get("*", function(req, res) {
-
-
-});
 }
