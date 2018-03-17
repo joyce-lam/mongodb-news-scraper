@@ -70,7 +70,7 @@ module.exports = function(app) {
 		db.Article.find({
 			saved: true
 		}).then(function(dbArticle) {
-			res.render("index", {articles: dbArticle});
+			res.render("saved", {articles: dbArticle});
 			// console.log("saved", dbArticle);
 			// res.json(dbArticle);
 		}).catch(function(err) {

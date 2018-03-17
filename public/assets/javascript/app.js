@@ -34,7 +34,7 @@ $(document).on("click", "#save-article", function() {
 //event listener to get all saved articles
 $(document).on("click", "#saved", function() {
 	$("#new").empty();
-	//$("#articles").empty();
+	$("#articles").empty();
 	$.ajax({
         method: "GET",
         url: "/articles/saved/"
@@ -45,7 +45,7 @@ $(document).on("click", "#saved", function() {
 
 //event listener to add note
 $(document).on("click", "#save-note", function() {
-	//event.preventDefault();
+	event.preventDefault();
     var thisId = $(this).attr("data-id");
     console.log("saveid", thisId);
     saveNote(thisId);
@@ -54,7 +54,7 @@ $(document).on("click", "#save-note", function() {
 //function to save note
 function saveNote(id) {
 	$(document).on("click", "#submit-note", function() {
-		//event.preventDefault();
+		event.preventDefault();
 	    $.ajax({
 	    	method: "POST",
 	    	url: "/articles/note/" + id,
@@ -73,6 +73,7 @@ $(document).on("click", "#read-note", function() {
 	event.preventDefault();
     var thisId = $("#read-note").attr("data-id");
     $(".modal-content").empty();
+    
     $.ajax({
     	method: "GET",
     	url: "/articles/note/" + thisId
