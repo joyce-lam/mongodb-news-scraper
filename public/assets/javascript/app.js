@@ -104,17 +104,14 @@ function saveNote(id) {
 	});
 }
 
+
 $(document).on("click", "#read-note", function() {
 	event.preventDefault();
     var thisId = $("#read-note").attr("data-id");
-    readNote(thisId);
-});
-
-
-function readNote(id) {
+    $(".modal-content").empty();
     $.ajax({
     	method: "GET",
-    	url: "/articles/note/" + id
+    	url: "/articles/note/" + thisId
     }).done(function(data) {
     	console.log(data);
     	for (var i = 0; i < data.notes.length; i++) {
@@ -124,13 +121,25 @@ function readNote(id) {
     		var deleteNoteBtn = $("<button>");
     		deleteNoteBtn.attr({
     			"id": "delete-note",
-    			"data-id": id
+    			"data-id": data.notes[i]._id
     		});
     		deleteNoteBtn.text("Delete")
 
     		$(".modal-content").append(renderNoteDiv, deleteNoteBtn);
     	}
     });
-}
+});
 
+$(document).on("click", "#delete-note", function() {
+	event.preventDefault();
+	var thisId = $("#delete-note").attr("data-id");
+	console.log("delete", thisId);
 
+	$.ajax({
+		method: "DELETE",
+		url: "/articles/note/" + thisId
+	}).done(function(data) {
+		console.log("Deleted Note");
+	});
+	console.log("abc");
+});

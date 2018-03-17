@@ -42,9 +42,6 @@ mongoose.connect("mongodb://localhost/news", {
 
 
 //routes
-
-
-
 app.get("/", function(req, res) {
     res.render("index");
 });
@@ -139,31 +136,28 @@ app.post("/articles/note/:id", function(req, res) {
 });
 
 
-// app.get("/articles/:id", function(req, res) {
-// 	db.Article.findOne({
-// 		_id: req.params.id
-// 	}).populate("notes")
-// 	.then(function(dbArticle) {
-// 		console.log(dbArticle);
-// 		//res.json(dbArticle);
-// 	}).catch(function(err) {
-// 		res.json(err);
-// 	});
-// });
+app.get("/articles/note/:id", function(req, res) {
+	db.Article.findOne({
+		_id: req.params.id
+	}).populate("notes")
+	.then(function(dbArticle) {
+		//console.log(dbArticle);
+		res.json(dbArticle);
+	}).catch(function(err) {
+		res.json(err);
+	});
+});
 
-
-
-
-// app.get("/articles/populated", function(req, res) {
-// 	db.Article.find({})
-// 	.populate("notes")
-// 	.then(function(dbArticle) {
-// 		res.json(dbArticle);
-// 	}).catch(function(err) {
-// 		res.json(err);
-// 	})
-// })
-
+app.delete("/articles/note/:id", function(req, res) {
+	console.log("delete req", req.params.id);
+	db.Note.findByIdAndRemove({
+		_id: req.params.id
+	}).then(function(dbNote) {
+		res.json(dbNote);
+	}).catch(function(err) {
+		res.json(err);
+	});
+});
 
 
 //start the server
