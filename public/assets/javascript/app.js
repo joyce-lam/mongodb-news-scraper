@@ -43,18 +43,18 @@ $(document).on("click", "#save-article", function() {
 
 
 $(document).on("click", "#saved", function() {
-	event.preventDefault();
-	$.getJSON("/articles/saved", function(data) {
-		console.log(data);
-		$("#articles").empty();
-		for (var i = 0; i < data.length; i++) {
+    event.preventDefault();
+    $.getJSON("/articles/saved", function(data) {
+        console.log(data);
+        $("#articles").empty();
+        for (var i = 0; i < data.length; i++) {
             var savedDiv = $("<div>");
             savedDiv.addClass("col-xs-12 col-sm-6 col-md-4");
             var savedLink = $("<a>");
             savedLink.attr("href", data[i].link);
             savedLink.text(data[i].title);
             var noteBtn = $("<button>")
-            noteBtn.attr("id", "save-note submit");
+            noteBtn.attr("id", "save-note");
             noteBtn.attr("data-id", data[i]._id)
             noteBtn.attr("data-toggle", "modal");
             noteBtn.attr("data-target", "#myModal");
@@ -62,18 +62,33 @@ $(document).on("click", "#saved", function() {
             savedDiv.append(savedLink, data[i].summary, noteBtn);
             $("#articles-saved").append(savedDiv);
         };
-	});
+    });
 });
 
 
 $(document).on("click", "#save-note", function() {
-	var thisId = $(this).attr("data-id");
-	console.log(thisId);
-	$(".model-content").empty();
-})
+	event.preventDefault();
+    var thisId = $("#save-note").attr("data-id");
+    console.log("outside", thisId);
+    saveNote(thisId);
+});
 
 
-$(document).on("click", "#submit-note", function() {
+function saveNote(id) {
+	$(document).on("click", "#submit-note", function() {
+		event.preventDefault();
+	    var note = $("#note").val().trim();
+	    console.log(note);
+	    console.log("noteid", id);
 
-})
+	    $.ajax({
+	    	method: "POST",
+	    	url: "/articles/notes/" + id,
+	    	data: note
+	    }).done(function(data) {
+	    	console.log(data);
+	    	$("#note").empty();
+	    });
+	});
+}
 
