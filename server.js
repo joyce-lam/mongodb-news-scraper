@@ -76,13 +76,9 @@ app.get("/scrape", function(req, res) {
                     });
             }
         });
-
-
-        //var articlesNum = results.length;
-
-
     });
 });
+
 
 app.get("/articles", function(req, res) {
     db.Article.find({})
@@ -99,31 +95,42 @@ app.get("/articles", function(req, res) {
 
 app.get("/articles/saved/:id", function(req, res) {
     db.Article.findOneAndUpdate({
-            _id: req.params.id
-        }, {
-            saved: true
-        }, {
-            new: true
-        },
-        function(err, edited) {
-            if (err) {
-                console.log(err);
-                res.send(error);
-            } else {
-                console.log(edited);
-            }
-        })
-
-
-})
-
-
-
+	        _id: req.params.id
+	    }, {
+	        saved: true
+	    }, {
+	        new: true
+	    },
+	    function(err, edited) {
+	        if (err) {
+	            console.log(err);
+	            res.send(error);
+	        } else {
+	            console.log(edited);
+	        }
+	    });
+});
 
 
 app.get("/articles/saved", function(req, res) {
 	db.Article.find({
 		saved: true
+	}).then(function(dbArticle) {
+		console.log("saved", dbArticle);
+		res.json(dbArticle);
+	}).catch(function(err) {
+		res.json(err);
+	});
+});
+
+
+app.post("/articles/note/:id", function(req, res) {
+	console.log("req", req.body);
+	db.Note.create(req.body)
+	.then(function(dbNote) {
+		return db.Article.findOneAndUpdate({_id: req.params.id}, {$push: {
+			notes: dbNote._id
+		}}, {new: true});
 	}).then(function(dbArticle) {
 		res.json(dbArticle);
 	}).catch(function(err) {
@@ -145,18 +152,7 @@ app.get("/articles/saved", function(req, res) {
 // });
 
 
-// app.post("/articles/:id", function(req, res) {
-// 	db.Note.create(req.body)
-// 	.then(function(dbNote) {
-// 		return db.Article.findOneAndUpdate({}, {$push: {
-// 			notes: dbNote._id
-// 		}}, {new: true});
-// 	}).then(function(dbArticle) {
-// 		res.json(dbArticle);
-// 	}).catch(function(err) {
-// 		res.json(err);
-// 	});
-// });
+
 
 // app.get("/articles/populated", function(req, res) {
 // 	db.Article.find({})
@@ -167,6 +163,8 @@ app.get("/articles/saved", function(req, res) {
 // 		res.json(err);
 // 	})
 // })
+
+
 
 //start the server
 app.listen(PORT, function() {

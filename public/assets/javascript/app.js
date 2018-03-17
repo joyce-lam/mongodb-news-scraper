@@ -77,14 +77,16 @@ $(document).on("click", "#save-note", function() {
 function saveNote(id) {
 	$(document).on("click", "#submit-note", function() {
 		event.preventDefault();
+	    console.log("noteid", id);
 	    var note = $("#note").val().trim();
 	    console.log(note);
-	    console.log("noteid", id);
 
 	    $.ajax({
 	    	method: "POST",
-	    	url: "/articles/notes/" + id,
-	    	data: note
+	    	url: "/articles/note/" + id,
+	    	data: {
+	    		body: $("#note").val().trim()
+	    	}
 	    }).done(function(data) {
 	    	console.log(data);
 	    	$("#note").empty();
