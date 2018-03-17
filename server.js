@@ -34,6 +34,7 @@ app.set("view engine", "handlebars");
 require("./routes/routes.js")(app);
 
 //database configuration with Mongoose
+//define local mongodb uri
 var databaseUri = "mongodb://localhost/news";
 
 if (process.env.MONGODB_URI) {
