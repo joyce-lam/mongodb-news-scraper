@@ -50,16 +50,30 @@ $(document).on("click", "#saved", function() {
         for (var i = 0; i < data.length; i++) {
             var savedDiv = $("<div>");
             savedDiv.addClass("col-xs-12 col-sm-6 col-md-4");
+
             var savedLink = $("<a>");
             savedLink.attr("href", data[i].link);
             savedLink.text(data[i].title);
-            var noteBtn = $("<button>")
-            noteBtn.attr("id", "save-note");
-            noteBtn.attr("data-id", data[i]._id)
-            noteBtn.attr("data-toggle", "modal");
-            noteBtn.attr("data-target", "#myModal");
-            noteBtn.text("Add Note");
-            savedDiv.append(savedLink, data[i].summary, noteBtn);
+
+            var saveNoteBtn = $("<button>");
+            saveNoteBtn.attr({
+            	"id": "save-note",
+            	"data-id": data[i]._id,
+            	"data-toggle": "modal",
+            	"data-target": "#myModal"
+            })
+            saveNoteBtn.text("Add Note");
+
+            var readNoteBtn = $("<button>");
+            readNoteBtn.attr({
+            	"id": "read-note",
+            	"data-id": data[i]._id,
+            	"data-toggle": "modal",
+            	"data-target": "#myModal"
+            })
+            readNoteBtn.text("See All Notes");
+
+            savedDiv.append(savedLink, data[i].summary, saveNoteBtn, readNoteBtn);
             $("#articles-saved").append(savedDiv);
         };
     });
@@ -69,7 +83,6 @@ $(document).on("click", "#saved", function() {
 $(document).on("click", "#save-note", function() {
 	event.preventDefault();
     var thisId = $("#save-note").attr("data-id");
-    console.log("outside", thisId);
     saveNote(thisId);
 });
 
@@ -77,10 +90,6 @@ $(document).on("click", "#save-note", function() {
 function saveNote(id) {
 	$(document).on("click", "#submit-note", function() {
 		event.preventDefault();
-	    console.log("noteid", id);
-	    var note = $("#note").val().trim();
-	    console.log(note);
-
 	    $.ajax({
 	    	method: "POST",
 	    	url: "/articles/note/" + id,
@@ -91,6 +100,37 @@ function saveNote(id) {
 	    	console.log(data);
 	    	$("#note").empty();
 	    });
+	    $("#note").val("");
 	});
 }
+
+$(document).on("click", "#read-note", function() {
+	event.preventDefault();
+    var thisId = $("#read-note").attr("data-id");
+    readNote(thisId);
+});
+
+
+function readNote(id) {
+    $.ajax({
+    	method: "GET",
+    	url: "/articles/note/" + id
+    }).done(function(data) {
+    	console.log(data);
+    	for (var i = 0; i < data.notes.length; i++) {
+    		var renderNoteDiv = $("<div>");
+    		renderNoteDiv.append("Note " + (i+1) + " " + data.notes[i].body);
+
+    		var deleteNoteBtn = $("<button>");
+    		deleteNoteBtn.attr({
+    			"id": "delete-note",
+    			"data-id": id
+    		});
+    		deleteNoteBtn.text("Delete")
+
+    		$(".modal-content").append(renderNoteDiv, deleteNoteBtn);
+    	}
+    });
+}
+
 
