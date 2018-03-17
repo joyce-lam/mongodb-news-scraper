@@ -1,0 +1,53 @@
+<nav class="navbar navbar-default">
+    <div class="container">
+        <div class="navbar-header">
+            <p class="navbar-brand"><strong>News</strong></p>
+        </div>
+        <ul class="nav navbar-nav navbar-text">
+            <div class="col-xs-4 col-sm-4">
+                <li><a href="/">Home</a></li>
+            </div>
+            <div class="col-xs-4 col-sm-4">
+                <li><a href="/articles/saved" id="saved">Saved</a></li>
+            </div>
+            <div class="col-xs-4 col-sm-4">
+                <li><a href="/scrape" id="scrape">Scrape New Articles</a></li>
+            </div>
+        </ul>
+    </div>
+</nav>
+<div id="new">
+    <a href="/articles" class="btn btn-secondary" id="all-articles" role="button">See All New Articles</a>
+</div>
+<div class="row" id="articles">
+    {{#each articles}}
+        {{#unless saved}}
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <a href={{this.link}}>{{this.title}}</a>
+                <p>{{this.summary}}</p>
+                <button id="save-article" data-id="{{this._id}}">Save Article</button>
+            </div>
+        {{/unless}}
+        {{#if saved}}
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <a href={{this.link}}>{{this.title}}</a>
+                <p>{{this.summary}}</p>
+                <button id="save-note" data-id="{{this._id}}" data-toggle="modal" data-target="#myModal">Add Note</button>
+                <button id="read-note" data-id="{{this._id}}" data-toggle="modal" data-target="#myModal">See All Notes</button>
+                <div id="myModal" class="modal fade" role="dialog">
+                    <div class="modal-header">
+                        <button type="button" class="close modalClose" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-content">
+                        <div class="form-group">
+                            <label for="note">Note:</label>
+                            <input type="text" class="form-control" id="note" placeholder="Enter Your Note">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-secondary" id="submit-note">Submit</button>
+                </div>
+            </div>
+        {{/if}}
+    {{/each}}
+</div>
+

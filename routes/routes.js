@@ -5,8 +5,6 @@ var cheerio = require("cheerio");
 var mongoose = require("mongoose");
 var db = require("../models");
 
-
-
 module.exports = function(app) {
 	//routes
 	app.get("/", function(req, res) {
@@ -18,8 +16,6 @@ module.exports = function(app) {
 	    request("https://www.nytimes.com/?mcubz=3&WT.z_jog=1&hF=f&vS=undefined", function(error, response, html) {
 	        // Load the body of the HTML into cheerio
 	        var $ = cheerio.load(html);
-	        // Empty array to save our scraped data
-
 	        var results = [];
 	        $("article.story.theme-summary").each(function(i, element) {
 	            var result = {};
@@ -31,7 +27,7 @@ module.exports = function(app) {
 	                console.log(result);
 	                db.Article.create(result)
 	                    .then(function(dbArticle) {
-	                        res.redirect("/")
+	                        res.redirect("/");
 	                    }).catch(function(err) {
 	                        res.json(err);
 	                    });
@@ -44,17 +40,14 @@ module.exports = function(app) {
 	app.get("/articles", function(req, res) {
 	    db.Article.find({})
 	        .then(function(dbArticle) {
-	            console.log("articles", dbArticle);
-	            //res.render("home", )
-	            res.json(dbArticle);
-	            // res.render("index", burger);
+	            res.render("index", {articles: dbArticle});
 	        }).catch(function(err) {
 	            res.json(err);
 	        });
 	});
 
 
-	app.get("/articles/saved/:id", function(req, res) {
+	app.put("/articles/saved/:id", function(req, res) {
 	    db.Article.findOneAndUpdate({
 		        _id: req.params.id
 		    }, {
@@ -77,8 +70,9 @@ module.exports = function(app) {
 		db.Article.find({
 			saved: true
 		}).then(function(dbArticle) {
-			console.log("saved", dbArticle);
-			res.json(dbArticle);
+			res.render("index", {articles: dbArticle});
+			// console.log("saved", dbArticle);
+			// res.json(dbArticle);
 		}).catch(function(err) {
 			res.json(err);
 		});
@@ -105,7 +99,6 @@ module.exports = function(app) {
 			_id: req.params.id
 		}).populate("notes")
 		.then(function(dbArticle) {
-			//console.log(dbArticle);
 			res.json(dbArticle);
 		}).catch(function(err) {
 			res.json(err);
