@@ -33,11 +33,27 @@ app.set("view engine", "handlebars");
 // Import routes and give the server access to them.
 require("./routes/routes.js")(app);
 
-//connect to MongoDB
-mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost/news", {
-    useMongoClient: true
+//database configuration with Mongoose
+var databaseUri = "mongodb://localhost/news";
+
+if (process.env.MONGODB_URI) {
+	mongoose.connect(process.env.MONGODB_URI);
+} else {
+	mongoose.connect(databaseUri);
+}
+
+var db = mongoose.connection;
+
+db.on("error", function(error) {
+	console.log("Mongoose error: ", error)
 });
+
+db.once("open", function() {
+	console.log("Mongoose connection successful");
+})
+
+mongoose.Promise = Promise;
+
 
 //start the server
 app.listen(PORT, function() {
