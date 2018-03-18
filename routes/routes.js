@@ -7,16 +7,18 @@ var db = require("../models");
 
 module.exports = function(app) {
 	//routes
+	//home route
 	app.get("/", function(req, res) {
 	    res.render("index");
 	});
 
+	//route to scrape
 	app.get("/scrape", function(req, res) {
 	    // Making a request for New York Times homepage
 	    request("https://www.nytimes.com/?mcubz=3&WT.z_jog=1&hF=f&vS=undefined", function(error, response, html) {
 	        // Load the body of the HTML into cheerio
 	        var $ = cheerio.load(html);
-	        var results = [];
+	        
 	        $("article.story.theme-summary").each(function(i, element) {
 	            var result = {};
 	            result.title = $(element).children("h2.story-heading").text();
@@ -27,16 +29,24 @@ module.exports = function(app) {
 	                console.log(result);
 	                db.Article.create(result)
 	                    .then(function(dbArticle) {
+	                    	console.log("db", dbArticle);
 	                        res.redirect("/");
 	                    }).catch(function(err) {
-	                        res.json(err);
+	                        if (err.code === 11000) {
+	                        	res.redirect("/error");
+	                        }
 	                    });
 	            }
 	        });
 	    });
 	});
 
+	//route for error when there is no new article
+	app.get("/error", function(req, res) {
+		res.render("err");
+	})
 
+	//route to get all articles
 	app.get("/articles", function(req, res) {
 	    db.Article.find({})
 	        .then(function(dbArticle) {
@@ -46,7 +56,7 @@ module.exports = function(app) {
 	        });
 	});
 
-
+	//route to update article to 'saved'
 	app.put("/articles/saved/:id", function(req, res) {
 	    db.Article.findOneAndUpdate({
 		        _id: req.params.id
@@ -65,20 +75,18 @@ module.exports = function(app) {
 		    });
 	});
 
-
+	//route to get all saved articles
 	app.get("/articles/saved", function(req, res) {
 		db.Article.find({
 			saved: true
 		}).then(function(dbArticle) {
 			res.render("saved", {articles: dbArticle});
-			// console.log("saved", dbArticle);
-			// res.json(dbArticle);
 		}).catch(function(err) {
 			res.json(err);
 		});
 	});
 
-
+	//route to add note
 	app.post("/articles/note/:id", function(req, res) {
 		console.log("req", req.body);
 		db.Note.create(req.body)
@@ -93,7 +101,7 @@ module.exports = function(app) {
 		});
 	});
 
-
+	//route to get all notes of a particular article
 	app.get("/articles/note/:id", function(req, res) {
 		db.Article.findOne({
 			_id: req.params.id
@@ -105,6 +113,7 @@ module.exports = function(app) {
 		});
 	});
 
+	//route to delete note
 	app.delete("/articles/note/:id", function(req, res) {
 		console.log("delete req", req.params.id);
 		db.Note.findByIdAndRemove({
